@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LifeLink – Smart Blood Donor Management</title>
+<style>
+:root{--bg:#F8FAFC;--card:#fff;--text:#1E293B;--muted:#64748B;--red:#B91C1C;--redsoft:#FEE2E2;--line:#E2E8F0;--ok:#16A34A;--okbg:#DCFCE7;--warn:#FEF3C7;--warntx:#92400E;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F172A;--card:#1E293B;--text:#F1F5F9;--muted:#94A3B8;--red:#EF4444;--redsoft:#450A0A;--line:#334155;--ok:#4ADE80;--okbg:#052E16;--warn:#422006;--warntx:#FCD34D;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F172A;--card:#1E293B;--text:#F1F5F9;--muted:#94A3B8;--red:#EF4444;--redsoft:#450A0A;--line:#334155;--ok:#4ADE80;--okbg:#052E16;--warn:#422006;--warntx:#FCD34D;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,Poppins,system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--card);border-bottom:1px solid var(--line);z-index:11}
+.nav{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.logo{font-weight:700;font-size:20px;color:var(--red)}
+nav{display:flex;gap:4px;align-items:center}
+nav a{padding:8px 10px;border-radius:8px;font-size:14px;color:var(--muted)}
+nav a:hover,nav a.on{color:var(--red);background:var(--redsoft)}
+#menu{display:none;background:none;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 12px;font-size:18px}
+@media(max-width:860px){#menu{display:block}nav{display:none;position:absolute;top:60px;left:0;right:0;background:var(--card);flex-direction:column;align-items:stretch;padding:10px 20px;border-bottom:1px solid var(--line)}nav.open{display:flex}}
+.btn{display:inline-block;background:var(--red);color:#fff;border:0;border-radius:10px;padding:11px 20px;font:600 15px inherit;cursor:pointer}
+.btn.alt{background:transparent;color:var(--red);border:2px solid var(--red)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.page{display:none;padding:36px 0 60px}.page.show{display:block}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;padding:24px 0}
+@media(max-width:760px){.hero{grid-template-columns:1fr}}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.15;margin:0 0 14px}
+h2{font-size:26px;margin:40px 0 6px}h3{margin:0 0 6px}
+.tag{color:var(--red);font-weight:600;font-style:italic}
+.muted{color:var(--muted)}
+.drop{font-size:140px;text-align:center;filter:drop-shadow(0 10px 20px rgba(185,28,28,.35))}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.stat{text-align:center}.stat b{display:block;font-size:30px;color:var(--red)}
+.bg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.bg button{background:var(--card);border:2px solid var(--line);color:var(--red);border-radius:14px;padding:18px 0;font:700 22px inherit;cursor:pointer}
+.bg button:hover{border-color:var(--red);background:var(--redsoft)}
+.note{background:var(--warn);color:var(--warntx);border-radius:10px;padding:12px 14px;font-size:14px;margin:16px 0}
+.cta{background:var(--red);color:#fff;border-radius:16px;padding:30px;margin-top:40px}
+.cta .btn{background:#fff;color:#B91C1C}
+form{display:grid;gap:14px;max-width:640px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+label{display:grid;gap:4px;font-size:14px;font-weight:600}
+input,select,textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);width:100%}
+.chk{display:flex;gap:8px;font-weight:400;align-items:flex-start}.chk input{width:auto;margin-top:5px}
+.err{color:var(--red);font-size:13px;font-weight:400;min-height:0}
+.msg{background:var(--okbg);color:var(--ok);border-radius:10px;padding:14px;margin-top:6px;font-weight:600}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+.pill.a{background:var(--okbg);color:var(--ok)}.pill.n{background:var(--warn);color:var(--warntx)}
+.big{font:700 28px/1 inherit;color:var(--red);background:var(--redsoft);border-radius:10px;padding:8px 12px;float:right}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.steps span{padding:4px 10px;border-radius:99px;background:var(--line);font-size:13px}.steps .cur{background:var(--red);color:#fff}
+footer{border-top:1px solid var(--line);background:var(--card);padding:28px 0;font-size:14px;color:var(--muted)}
+footer a{margin-right:14px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}.tabs button{flex:1}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+<a href="#home" class="logo">🩸 LifeLink</a>
+<button id="menu" aria-label="Menu">☰</button>
+<nav id="nav">
+<a href="#home">Home</a><a href="#about">About</a><a href="#find">Find Donors</a><a href="#donor">Become a Donor</a><a href="#emergency">Emergency</a><a href="#hospitals">Hospitals</a><a href="#dash">Dashboard</a><a href="#login">Login</a>
+</nav></div></header>
+
+<main class="wrap">
+<!-- HOME -->
+<section class="page" id="p-home">
+<div class="hero"><div>
+<p class="tag">Every Drop Counts. Every Second Matters.</p>
+<h1>Donate Blood. Save Lives. Connect Through LifeLink.</h1>
+<p class="muted">A smart blood donor management and emergency response platform connecting donors, patients, hospitals and blood banks. Find potential donors by blood group and location, register as a donor, and submit emergency requests in one place.</p>
+<p><a class="btn" href="#find">Find Blood Donors</a> <a class="btn alt" href="#donor">Become a Donor</a></p>
+<p class="muted"><i>Your one donation could make a life-changing difference.</i></p>
+</div><div class="drop">🩸</div></div>
+
+<div class="grid">
+<div class="card stat"><b>250+</b>Registered Donors</div>
+<div class="card stat"><b>8</b>Blood Groups</div>
+<div class="card stat"><b>35+</b>Emergency Requests</div>
+<div class="card stat"><b>10+</b>Partner Hospitals</div>
+</div>
+<p class="muted" style="font-size:13px">Counts come from the demo database (sample data, not real LifeLink results).</p>
+
+<h2>Our Main Services</h2>
+<div class="grid">
+<div class="card"><h3>🔍 Find Blood Donors</h3><p class="muted">Search potential donors by blood group and location.</p><a class="btn sm" href="#find">Find Donors</a></div>
+<div class="card"><h3>❤️ Become a Donor</h3><p class="muted">Register your blood group, location and availability.</p><a class="btn sm" href="#donor">Register as Donor</a></div>
+<div class="card"><h3>🚨 Emergency Requests</h3><p class="muted">Submit urgent requirements with hospital and contact details.</p><a class="btn sm" href="#emergency">Request Blood</a></div>
+<div class="card"><h3>📍 Nearby Discovery</h3><p class="muted">Explore potential donors in a selected area by city.</p><a class="btn sm" href="#nearby">Explore Nearby</a></div>
+<div class="card"><h3>🏥 Hospitals &amp; Blood Banks</h3><p class="muted">Find facility contact information kept on the platform.</p><a class="btn sm" href="#hospitals">Explore Facilities</a></div>
+<div class="card"><h3>🔄 Availability Management</h3><p class="muted">Donors can keep their availability up to date.</p><a class="btn sm" href="#dash">Manage Availability</a></div>
+</div>
+
+<h2>How LifeLink Works</h2>
+<div class="grid">
+<div class="card"><h3>1 · Register</h3><p class="muted">Donors create a profile with name, blood group, location and contact details.</p></div>
+<div class="card"><h3>2 · Search</h3><p class="muted">Patients search for potential donors by blood group and location.</p></div>
+<div class="card"><h3>3 · Connect</h3><p class="muted">Review available donor information and follow the contact process.</p></div>
+<div class="card"><h3>4 · Coordinate</h3><p class="muted">Donors, patients, hospitals and blood banks work together on the request.</p></div>
+</div>
+<div class="note">Donor availability and registration do not guarantee medical eligibility or blood compatibility. Healthcare professionals must confirm these.</div>
+
+<h2>Blood Groups</h2>
+<p class="muted">Select a group to search donors. Compatibility must be confirmed by healthcare professionals.</p>
+<div class="bg" id="groups"></div>
+
+<h2>Featured Blood Donors</h2>
+<p class="muted">Sample donor cards with fictional details.</p>
+<div class="grid" id="featured"></div>
+
+<div class="cta"><h2 style="margin-top:0">Need Blood Urgently? Start Here.</h2>
+<p>Submit your blood request with the required group, hospital location and urgency details. LifeLink can help identify potential donors and organise request information.</p>
+<a class="btn" href="#emergency">Create Emergency Request</a>
+<p style="font-size:13px;opacity:.9">LifeLink supports donor discovery and request coordination. It does not guarantee blood availability or replace emergency medical services. For urgent medical needs, contact a hospital or local emergency service immediately.</p></div>
+</section>
+
+<!-- ABOUT -->
+<section class="page" id="p-about">
+<h1>About LifeLink</h1>
+<p>LifeLink is a Smart Blood Donor Management and Emergency Response System that improves how potential blood donors are found in normal and emergency situations. It gives patients, donors, hospitals and blood banks one central interface.</p>
+<p class="muted">Traditional methods rely on phone calls, social media posts and separate records, which makes it hard to find suitable donors quickly. LifeLink offers donor registration, blood group search, location-based discovery, availability information and emergency request management.</p>
+<div class="grid">
+<div class="card"><h3>Our Mission</h3><p class="muted">To support timely blood donor discovery and improve coordination between donors, patients, hospitals and blood banks through an accessible digital platform.</p></div>
+<div class="card"><h3>Our Vision</h3><p class="muted">A reliable, scalable platform that supports blood donation awareness, organised donor information and emergency response coordination.</p></div>
+</div>
+<h2>Objectives</h2>
+<ol><li>Create a centralised donor management platform.</li><li>Search potential donors by blood group.</li><li>Support location-based discovery.</li><li>Let donors register and update availability.</li><li>Provide a structured emergency request process.</li><li>Improve communication among users.</li><li>Protect donor and patient information.</li><li>Lay a foundation for hospital and blood bank integration.</li></ol>
+<h2>Technologies</h2>
+<div class="grid">
+<div class="card"><b>Frontend</b><br>HTML, CSS, JavaScript</div>
+<div class="card"><b>Backend</b><br>Python, FastAPI</div>
+<div class="card"><b>Database</b><br>Supabase (PostgreSQL)</div>
+<div class="card"><b>Tools</b><br>VS Code, Git, GitHub</div>
+</div>
+</section>
+
+<!-- FIND -->
+<section class="page" id="p-find">
+<h1>Find Blood Donors Near You</h1>
+<p class="muted">Search potential donors by blood group and location, then confirm availability and medical compatibility with the hospital or blood bank.</p>
+<form id="ff" novalidate>
+<div class="row">
+<label>Required Blood Group<select id="fg"><option value="">Select Blood Group</option></select></label>
+<label>Availability<select id="fa"><option value="">Any Status</option><option>Available for Contact</option><option>Availability Not Confirmed</option></select></label>
+</div>
+<div class="row">
+<label>State<input id="fs" value="Karnataka"></label>
+<label>District / City or PIN<input id="fc" placeholder="e.g. Kalaburagi"></label>
+</div>
+<div><button class="btn" type="submit">Search Donors</button> <button class="btn alt" type="reset" id="fr">Reset</button></div>
+<div class="err" id="ferr"></div>
+</form>
+<div id="fres" style="margin-top:20px"></div>
+</section>
+
+<!-- DONOR -->
+<section class="page" id="p-donor">
+<h1>Become a LifeLink Blood Donor</h1>
+<p class="muted">Register your details so authorised users can identify potential donors when needed. Your full address and phone number are never shown publicly.</p>
+<form id="df" novalidate>
+<label>Full Name<input id="dn"></label>
+<div class="row"><label>Date of Birth<input type="date" id="db"></label>
+<label>Gender (optional)<select><option>Prefer not to say</option><option>Male</option><option>Female</option><option>Other</option></select></label></div>
+<div class="row"><label>Blood Group<select id="dg"><option value="">Select</option></select></label>
+<label>Availability<select id="da"><option>Available for Contact</option><option>Temporarily Unavailable</option><option>Availability Not Confirmed</option></select></label></div>
+<div class="row"><label>Mobile Number<input id="dm" type="tel"></label><label>Email Address<input id="de" type="email"></label></div>
+<div class="row"><label>State<input id="ds" value="Karnataka"></label><label>District / City<input id="dc"></label></div>
+<div class="row"><label>Area / PIN Code<input></label><label>Last Donation Date (optional)<input type="date"></label></div>
+<label class="chk"><input type="checkbox" id="dk"> I consent to share relevant details for donor discovery.</label>
+<div class="err" id="derr"></div>
+<div><button class="btn" type="submit">Register as Donor</button></div>
+<div id="dok"></div>
+</form>
+<div class="note">Registration does not confirm medical eligibility. Eligibility and donation intervals must be assessed by qualified healthcare professionals.</div>
+</section>
+
+<!-- EMERGENCY -->
+<section class="page" id="p-emergency">
+<h1>Create an Emergency Blood Request</h1>
+<p class="muted">Organise the details of a blood requirement. Accurate information helps identify potential donor records and supports communication with hospitals and blood banks.</p>
+<form id="ef" novalidate>
+<div class="row"><label>Patient Name / Reference ID<input id="en"></label>
+<label>Required Blood Group<select id="eg"><option value="">Select</option></select></label></div>
+<div class="row"><label>Units Required<input type="number" min="1" value="1" id="eu"></label>
+<label>Urgency (request label, not clinical triage)<select><option>Urgent</option><option>High Priority</option><option>Routine</option></select></label></div>
+<div class="row"><label>Hospital Name<input id="eh"></label><label>Hospital Location<input></label></div>
+<div class="row"><label>City / District<input id="ec"></label><label>Required Date<input type="date"></label></div>
+<div class="row"><label>Contact Person<input></label><label>Contact Number<input type="tel" id="ep"></label></div>
+<label>Additional Information<textarea rows="3"></textarea></label>
+<label class="chk"><input type="checkbox" id="ek"> I consent to my request details being used to coordinate this request.</label>
+<div class="err" id="eerr"></div>
+<div><button class="btn" type="submit">Submit Blood Request</button></div>
+</form>
+<div id="eok"></div>
+<div class="note">LifeLink does not replace emergency medical services. In a medical emergency, contact a hospital or local emergency service immediately.</div>
+</section>
+
+<!-- HOSPITALS -->
+<section class="page" id="p-hospitals">
+<h1>Hospitals and Blood Banks</h1>
+<p class="muted">Facilities that may be relevant to your blood requirement. All entries below are sample data until verified.</p>
+<div class="tabs"><button class="btn sm" data-f="">All</button><button class="btn alt sm" data-f="Hospital">Hospitals</button><button class="btn alt sm" data-f="Blood Bank">Blood Banks</button></div>
+<div class="grid" id="fac"></div>
+</section>
+
+<!-- LOGIN -->
+<section class="page" id="p-login">
+<h1>Welcome to LifeLink</h1>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+<div class="card"><h3>Login</h3>
+<form id="lf" novalidate>
+<label>Email or Mobile Number<input id="lu"></label>
+<label>Password<input type="password" id="lp"></label>
+<label class="chk"><input type="checkbox"> Remember me</label>
+<div class="err" id="lerr"></div>
+<button class="btn" type="submit">Login</button>
+<a href="#login" class="muted" style="font-size:14px">Forgot password?</a>
+<div id="lok"></div>
+</form></div>
+<div class="card"><h3>Create an Account</h3>
+<form id="rf" novalidate>
+<label>Account Type<select><option>Blood Donor</option><option>Patient / Requester</option><option>Hospital</option><option>Blood Bank</option></select></label>
+<label>Name<input id="rn"></label>
+<label>Email<input type="email" id="re"></label>
+<label>Password<input type="password" id="rp"></label>
+<div class="err" id="rerr"></div>
+<button class="btn" type="submit">Create an Account</button>
+<div id="rok"></div>
+</form></div></div>
+<p class="muted" style="font-size:14px">Demo only: no real authentication happens. Administrator accounts are never created through public registration.</p>
+</section>
+<style>nav a{padding:8px 7px;font-size:13px}.tb{width:100%;border-collapse:collapse;font-size:13px}.tb td,.tb th{padding:8px;border-bottom:1px solid var(--line);text-align:left}.map{position:relative;height:280px;border-radius:14px;background:var(--redsoft);border:1px solid var(--line);margin:16px 0;overflow:hidden}.pin{position:absolute;transform:translate(-50%,-50%);background:var(--red);color:#fff;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:600;white-space:nowrap}</style>
+<section class="page" id="p-nearby"><h1>Discover Potential Donors by Location</h1>
+<p class="muted">Combine a blood group with a city to see potential donors in that area. The map shows approximate city areas only.</p>
+<form id="nf" novalidate><div class="row"><label>Blood Group<select id="ng"><option value="">Any</option></select></label><label>State<input value="Karnataka"></label></div>
+<div class="row"><label>City<input id="nc" placeholder="e.g. Bengaluru"></label><label>&nbsp;<button class="btn alt" type="button" id="geo">📍 Use My Location</button></label></div>
+<div><button class="btn" type="submit">Search This Area</button> <button class="btn alt" type="reset" id="nr">Reset Filters</button></div></form>
+<p class="muted" id="nmsg"></p><div class="map" id="map"></div><div class="grid" id="nres"></div>
+<div class="note">A nearby result does not establish medical suitability or guarantee availability. Exact donor addresses are never shown.</div></section>
+<section class="page" id="p-dash"><h1 id="dh">Dashboard</h1><div id="dashbody"></div></section>
+<section class="page" id="p-contact"><h1>Contact LifeLink</h1><p class="muted">Questions about the platform, its features or technical issues? Send the project team a message.</p>
+<form id="cf" novalidate><label>Full Name<input></label><label>Email Address<input type="email"></label><label>Subject<input></label><label>Message<textarea rows="4"></textarea></label>
+<div class="err" id="cerr"></div><div><button class="btn" type="submit">Send Message</button></div><div id="cok"></div></form></section>
+<section class="page" id="p-privacy"><h1>Privacy and Data Protection</h1>
+<p>LifeLink supports blood donor discovery and emergency request coordination. It may process names, blood groups, contact details, locations, availability and request details.</p>
+<ol><li><b>Data minimisation:</b> collect only what the platform needs.</li><li><b>User consent:</b> obtain consent before collecting or sharing personal information.</li><li><b>Access control:</b> restrict sensitive records to authorised users.</li><li><b>Location privacy:</b> ask permission before using device location and never show exact private addresses.</li><li><b>Secure authentication:</b> use proper authentication and access controls.</li><li><b>Data accuracy:</b> let users correct outdated information.</li><li><b>Data protection:</b> protect data in storage and transit.</li><li><b>Limited disclosure:</b> share contact details only under platform rules and applicable law.</li></ol>
+<div class="note">Draft prototype content, not a complete legal policy. Review against applicable Indian data-protection requirements before launching a real service.</div></section>
+</main>
+
+<footer><div class="wrap">
+<b style="color:var(--text)">🩸 LifeLink</b> — Smart Blood Donor Management and Emergency Response System.<br>
+<p><a href="#home">Home</a><a href="#about">About</a><a href="#find">Find Donors</a><a href="#donor">Become a Donor</a><a href="#emergency">Emergency</a><a href="#nearby">Nearby</a><a href="#contact">Contact Us</a><a href="#privacy">Privacy Policy</a></p>
+<p>Kalaburagi, Karnataka, India · Contact: add your project email and phone here.</p>
+<p>Designed to support blood donor discovery, emergency coordination and community participation. Prototype with sample data; draft privacy practices only: collect minimal data, obtain consent, restrict access, never show exact addresses.</p>
+</div></footer>
+
+<script>
+var G=["A+","A−","B+","B−","AB+","AB−","O+","O−"];
+var D=[
+{id:"LL-D001",n:"Sample Donor 1",g:"O+",c:"Kalaburagi",a:"Available for Contact",l:"Example date"},
+{id:"LL-D002",n:"Sample Donor 2",g:"B+",c:"Kalaburagi",a:"Availability Not Confirmed",l:"Example date"},
+{id:"LL-D003",n:"Sample Donor 3",g:"AB+",c:"Kalaburagi",a:"Availability Not Confirmed",l:"Example date"},
+{id:"LL-D004",n:"Sample Donor 4",g:"B+",c:"Kalaburagi",a:"Available for Contact",l:"Example date"},
+{id:"LL-D005",n:"Sample Donor 5",g:"A+",c:"Bengaluru",a:"Available for Contact",l:"Example date"},
+{id:"LL-D006",n:"Sample Donor 6",g:"O−",c:"Bengaluru",a:"Available for Contact",l:"Example date"},
+{id:"LL-D007",n:"Sample Donor 7",g:"A−",c:"Mysuru",a:"Availability Not Confirmed",l:"Example date"},
+{id:"LL-D008",n:"Sample Donor 8",g:"B−",c:"Hubballi",a:"Available for Contact",l:"Example date"}];
+var F=[
+{n:"Sample City Hospital",t:"Hospital",c:"Kalaburagi",s:"Emergency Care"},
+{n:"Sample District Hospital",t:"Hospital",c:"Bengaluru",s:"Emergency Care, Transfusion Unit"},
+{n:"Sample Community Blood Bank",t:"Blood Bank",c:"Kalaburagi",s:"Blood availability enquiries"},
+{n:"Sample Central Blood Bank",t:"Blood Bank",c:"Bengaluru",s:"Blood availability enquiries"}];
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function opts(id){G.forEach(function(g){var o=document.createElement("option");o.textContent=g;o.value=g;$(id).appendChild(o)})}
+["fg","dg","eg"].forEach(opts);
+function dcard(d,full){return '<div class="card"><span class="pill '+(d.a[0]=="A"&&d.a[1]=="v"&&d.a.indexOf("Not")<0?"a":"n")+'">'+d.a+'</span><span class="big">'+d.g+'</span><h3 style="margin-top:10px">'+esc(d.n)+'</h3><div class="muted" style="font-size:14px">ID '+d.id+' · '+esc(d.c)+'<br>Last donation: '+d.l+'<br><i>Sample record</i></div>'+(full&&d.a=="Available for Contact"?'<p><button class="btn sm" onclick="alert(\'Demo: request sent to '+d.id+'\')">Send Request</button></p>':'')+'</div>'}
+$("featured").innerHTML=D.slice(0,4).map(function(d){return dcard(d)}).join("");
+$("groups").innerHTML=G.map(function(g){return '<button data-g="'+g+'">'+g+'</button>'}).join("");
+$("groups").onclick=function(e){var g=e.target.dataset.g;if(g){$("fg").value=g;location.hash="find";search()}};
+
+function search(){
+ var g=$("fg").value,a=$("fa").value,c=$("fc").value.trim().toLowerCase();
+ if(!g){$("ferr").textContent="Please select a blood group.";return}
+ $("ferr").textContent="";
+ var r=D.filter(function(d){return d.v!==false&&d.g==g&&(!a||d.a==a)&&(!c||d.c.toLowerCase().indexOf(c)>-1)});
+ $("fres").innerHTML=r.length?'<h3>Potential Donors Found</h3><p class="muted">These sample records match your criteria. Please confirm the donor\'s current availability and consult the hospital or blood bank about medical compatibility.</p><div class="grid">'+r.map(function(d){return dcard(d,1)}).join("")+'</div>':'<div class="card"><h3>No Matching Donors Found</h3><p class="muted">No donor records currently match. Try another location or contact a nearby hospital or blood bank.</p></div>';
+}
+$("ff").onsubmit=function(e){e.preventDefault();search()};
+$("fr").onclick=function(){setTimeout(function(){$("fres").innerHTML="";$("ferr").textContent=""},0)};
+
+function bad(v){return !String(v).trim()}
+var mailOk=/^[^@\s]+@[^@\s]+\.[^@\s]+$/,phOk=/^[6-9]\d{9}$/;
+$("df").onsubmit=function(e){e.preventDefault();var m="";
+ if(bad($("dn").value))m="Please enter your full name.";
+ else if(!$("dg").value)m="Please select your blood group.";
+ else if(!phOk.test($("dm").value.replace(/\D/g,"").slice(-10)))m="Please enter a valid mobile number.";
+ else if(!mailOk.test($("de").value))m="Please enter a valid email address.";
+ else if(bad($("dc").value))m="Please select your location.";
+ else if(!$("dk").checked)m="Please provide the required consent.";
+ $("derr").textContent=m;$("dok").innerHTML="";
+ if(!m)$("dok").innerHTML='<div class="msg">Registration Submitted Successfully!<br><span style="font-weight:400">Thank you for registering. Your profile should be searchable only according to the platform\'s verification, consent and privacy settings.</span></div>'};
+
+$("ef").onsubmit=function(e){e.preventDefault();var m="";
+ if(bad($("en").value))m="Please enter the patient name or reference ID.";
+ else if(!$("eg").value)m="Please select the required blood group.";
+ else if(bad($("eh").value)||bad($("ec").value))m="Please enter the hospital name and city.";
+ else if(!phOk.test($("ep").value.replace(/\D/g,"").slice(-10)))m="Please enter a valid contact number.";
+ else if(!$("ek").checked)m="Please provide the required consent.";
+ $("eerr").textContent=m;$("eok").innerHTML="";
+ if(!m){var n=D.filter(function(d){return d.g==$("eg").value}).length;
+ $("eok").innerHTML='<div class="msg">Blood Request Submitted<br><span style="font-weight:400">Your request has been recorded in this prototype. Please contact the treating hospital or blood bank directly to confirm availability and next steps. '+n+' sample donor record(s) match this group.</span></div><div class="steps"><span class="cur">Submitted</span><span>Under Review</span><span>Potential Donors Identified</span><span>Contact in Progress</span><span>Closed</span></div>'}};
+
+function fac(t){$("fac").innerHTML=F.filter(function(f){return !t||f.t==t}).map(function(f){return '<div class="card"><span class="pill n">Sample data</span><h3 style="margin-top:8px">'+(f.t=="Hospital"?"🏥 ":"🩸 ")+f.n+'</h3><div class="muted" style="font-size:14px">'+f.t+' · '+f.c+'<br>Services: '+f.s+'<br>Contact: demonstration contact information</div></div>'}).join("")}
+fac("");
+document.querySelector(".tabs").onclick=function(e){var b=e.target.closest("button");if(!b)return;fac(b.dataset.f);[].forEach.call(this.children,function(x){x.className="btn sm"+(x==b?"":" alt")})};
+
+$("lf").onsubmit=function(e){e.preventDefault();var m=bad($("lu").value)?"Please enter your email or mobile number.":bad($("lp").value)?"Please enter your password.":"";
+ $("lerr").textContent=m;$("lok").innerHTML=m?"":'<div class="msg">Demo login accepted. No real authentication occurs.</div>'};
+$("rf").onsubmit=function(e){e.preventDefault();var m=bad($("rn").value)?"Please enter your name.":!mailOk.test($("re").value)?"Please enter a valid email address.":$("rp").value.length<8?"Password must be at least 8 characters.":"";
+ $("rerr").textContent=m;$("rok").innerHTML=m?"":'<div class="msg">Account created (demo). Verification would be required in the real system.</div>'};
+
+function route(){var h=(location.hash||"#home").slice(1);if(!$("p-"+h))h="home";
+ [].forEach.call(document.querySelectorAll(".page"),function(p){p.classList.toggle("show",p.id=="p-"+h)});
+ [].forEach.call(document.querySelectorAll("nav a"),function(a){a.classList.toggle("on",a.getAttribute("href")=="#"+h)});
+ $("nav").classList.remove("open");window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);route();
+$("menu").onclick=function(){$("nav").classList.toggle("open")};
+</script>
+<script>
+/* ---- Dummy database (tables persisted in this browser via localStorage) ---- */
+var KEY="ll_demo_db_v1",S=null,DB=null,ST=["Submitted","Under Review","Potential Donors Identified","Contact in Progress","Closed"];
+function seed(){D.forEach(function(d){d.v=true});
+ return {users:[{id:"u1",name:"Admin",email:"admin@lifelink.demo",pw:"Admin@123",role:"admin"},{id:"u2",name:"Sample Donor 1",email:"donor@lifelink.demo",pw:"Donor@123",role:"donor",did:"LL-D001"},{id:"u3",name:"Sample Patient",email:"patient@lifelink.demo",pw:"Patient@123",role:"patient"}],
+ donors:D,
+ blood_requests:[{id:"LR-001",rid:"u3",pn:"Ref-1001",g:"B+",u:2,h:"Sample City Hospital",c:"Kalaburagi",urg:"Urgent",st:"Potential Donors Identified",d:"2026-10-18"},{id:"LR-002",rid:"u3",pn:"Ref-1002",g:"O−",u:1,h:"Sample District Hospital",c:"Bengaluru",urg:"High Priority",st:"Under Review",d:"2026-10-19"}],
+ hospitals:F.filter(function(f){return f.t=="Hospital"}),blood_banks:F.filter(function(f){return f.t=="Blood Bank"}),notifications:[{id:"N-001",did:"LL-D004",rid:"LR-001",t:"New B+ request at Sample City Hospital, Kalaburagi",d:"2026-10-18"}],messages:[]}}
+var SEED=JSON.stringify(seed());
+try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!DB||!DB.users)DB=JSON.parse(SEED);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function setRefs(){D=DB.donors;F=DB.hospitals.concat(DB.blood_banks)}
+setRefs();fac("");
+function nid(p,a){return p+String(a.length+1).padStart(3,"0")}
+function today(){return new Date().toISOString().slice(0,10)}
+function stats(){var b=document.querySelectorAll(".stat b");b[0].textContent=D.length;b[2].textContent=DB.blood_requests.length;b[3].textContent=DB.hospitals.length+DB.blood_banks.length}
+
+/* ---- Forms write to the database ---- */
+$("df").addEventListener("submit",function(){if($("derr").textContent||!$("dok").innerHTML)return;
+ var d={id:nid("LL-D",DB.donors),n:$("dn").value.trim(),g:$("dg").value,c:$("dc").value.trim(),a:$("da").value,l:"—",v:false,ph:$("dm").value,em:$("de").value};
+ DB.donors.push(d);if(S&&S.role=="donor"&&!S.did)S.did=d.id;save();
+ $("dok").insertAdjacentHTML("beforeend","<p class='muted'>Donor ID <b>"+d.id+"</b> saved to the demo database as <i>pending verification</i>. Log in as admin to verify it; it then appears in searches.</p>")});
+$("ef").addEventListener("submit",function(){if($("eerr").textContent||!$("eok").innerHTML)return;
+ var r={id:nid("LR-",DB.blood_requests),rid:S?S.id:"guest",pn:$("en").value.trim(),g:$("eg").value,u:+$("eu").value||1,h:$("eh").value.trim(),c:$("ec").value.trim(),urg:$("ef").querySelectorAll("select")[1].value,st:"Submitted",d:today()};
+ DB.blood_requests.push(r);
+ D.forEach(function(x){if(x.v&&x.g==r.g&&x.a=="Available for Contact")DB.notifications.push({id:nid("N-",DB.notifications),did:x.id,rid:r.id,t:"New "+r.g+" request at "+r.h+", "+r.c,d:today()})});
+ save();$("eok").insertAdjacentHTML("afterbegin","<p>Request ID <b>"+r.id+"</b> saved to the demo database. Matching available donors were notified (demo).</p>")});
+$("cf").onsubmit=function(e){e.preventDefault();var f=$("cf").querySelectorAll("input,textarea"),m=bad(f[0].value)?"Please enter your name.":!mailOk.test(f[1].value)?"Please enter a valid email address.":bad(f[3].value)?"Please enter a message.":"";
+ $("cerr").textContent=m;$("cok").innerHTML="";if(m)return;
+ DB.messages.push({id:nid("M-",DB.messages),name:f[0].value,email:f[1].value,subject:f[2].value,body:f[3].value,d:today()});save();
+ $("cok").innerHTML='<div class="msg">Thank You for Contacting Us!<br><span style="font-weight:400">Your message was saved in the demo database. A real deployment would send it to a backend or project email.</span></div>';$("cf").reset()};
+
+/* ---- Auth against the users table (demo: plain-text passwords; use Supabase Auth in production) ---- */
+$("lf").onsubmit=function(e){e.preventDefault();var u=$("lu").value.trim().toLowerCase(),p=$("lp").value,m="";
+ if(!u)m="Please enter your email or mobile number.";else if(!p)m="Please enter your password.";
+ else{var f=DB.users.filter(function(x){return x.email==u&&x.pw==p})[0];if(!f)m="Invalid login details.";else{S=f;$("lf").reset();location.hash="dash"}}
+ $("lerr").textContent=m};
+$("rf").onsubmit=function(e){e.preventDefault();var em=$("re").value.trim().toLowerCase(),
+ m=bad($("rn").value)?"Please enter your name.":!mailOk.test(em)?"Please enter a valid email address.":$("rp").value.length<8?"Password must be at least 8 characters.":DB.users.some(function(x){return x.email==em})?"This email is already registered.":"";
+ $("rerr").textContent=m;if(m)return;
+ var u={id:nid("u",DB.users),name:$("rn").value.trim(),email:em,pw:$("rp").value,role:["donor","patient","hospital","bloodbank"][$("rf").querySelector("select").selectedIndex]};
+ DB.users.push(u);save();S=u;$("rf").reset();location.hash="dash"};
+
+/* ---- Dashboards ---- */
+function card(t,v){return '<div class="card stat"><b>'+v+'</b>'+t+'</div>'}
+function me(){return DB.donors.filter(function(x){return S&&x.id==S.did})[0]}
+function pill(s){return '<span class="pill '+(s=="Closed"?"a":"n")+'">'+s+'</span>'}
+function dash(){var el=$("dashbody");
+ if(!S){el.innerHTML='<div class="card"><h3>Please log in</h3><p class="muted">Demo accounts:</p><p>Admin: admin@lifelink.demo / Admin@123<br>Donor: donor@lifelink.demo / Donor@123<br>Patient: patient@lifelink.demo / Patient@123</p><a class="btn" href="#login">Go to Login</a></div>';$("dh").textContent="Dashboard";return}
+ $("dh").textContent={admin:"LifeLink Administration Panel",donor:"Welcome to Your Donor Dashboard",patient:"Patient Dashboard"}[S.role]||"Facility Dashboard";
+ var h='<p>Signed in as <b>'+esc(S.name)+'</b> ('+S.role+') · <button class="btn alt sm" data-act="out">Log out</button></p>';
+ if(S.role=="donor"){var d=me();
+  if(!d)h+='<div class="card"><p>You don’t have a donor profile yet.</p><a class="btn" href="#donor">Become a Donor</a></div>';
+  else{var n=DB.notifications.filter(function(x){return x.did==d.id});
+   h+='<div class="grid">'+card("Profile Status",d.v?"Verified":"Pending")+card("Blood Group",d.g)+card("Requests Received",n.length)+card("Last Donation",d.l)+'</div>'
+   +'<div class="card" style="margin-top:16px"><h3>My Availability</h3><select data-act="avail">'+["Available for Contact","Temporarily Unavailable","Availability Not Confirmed"].map(function(o){return "<option"+(o==d.a?" selected":"")+">"+o+"</option>"}).join("")+'</select></div>'
+   +'<div class="card" style="margin-top:16px"><h3>Requests</h3>'+(n.length?n.map(function(x){return "<p>"+esc(x.t)+' <span class="muted">('+x.d+")</span></p>"}).join(""):'<p class="muted">No requests yet.</p>')+'</div>'
+   +'<div class="note">This dashboard does not declare you medically eligible. Eligibility must be confirmed by healthcare professionals.</div>'}}
+ else if(S.role=="patient"){var r=DB.blood_requests.filter(function(x){return x.rid==S.id}),l=r[r.length-1];
+  h+='<div class="grid">'+card("My Blood Requests",r.length)+card("Current Status",l?l.st:"—")+card("Potential Donors",l?D.filter(function(x){return x.v&&x.g==l.g}).length:0)+card("Hospitals Listed",DB.hospitals.length)+'</div>'
+  +'<p><a class="btn" href="#emergency">Create New Request</a></p><h3>My Requests</h3>'+(r.length?r.map(function(x){return '<div class="card" style="margin-bottom:10px"><b>'+x.id+'</b> · '+x.g+' · '+x.u+' unit(s) · '+esc(x.h)+', '+esc(x.c)+' · '+x.urg+' '+pill(x.st)+'</div>'}).join(""):'<p class="muted">No requests yet.</p>')
+  +'<div class="note">A request is only shown as fulfilled once the outcome has been confirmed.</div>'}
+ else if(S.role=="admin"){
+  var pend=DB.donors.filter(function(x){return !x.v}).length,act=DB.blood_requests.filter(function(x){return x.st!="Closed"}).length;
+  h+='<div class="grid">'+card("Registered Users",DB.users.length)+card("Registered Donors",DB.donors.length)+card("Pending Verification",pend)+card("Active Requests",act)+'</div>'
+  +'<h2>Donor Management</h2><div style="overflow-x:auto"><table class="tb"><tr><th>ID<th>Name<th>Group<th>City<th>Status<th></tr>'+DB.donors.map(function(x){return "<tr><td>"+x.id+"<td>"+esc(x.n)+"<td>"+x.g+"<td>"+esc(x.c)+"<td>"+(x.v?"Verified":"Pending")+"<td>"+(x.v?"":'<button class="btn sm" data-act="ver" data-id="'+x.id+'">Verify</button> ')+'<button class="btn alt sm" data-act="del" data-id="'+x.id+'">Remove</button></tr>'}).join("")+'</table></div>'
+  +'<h2>Blood Request Management</h2><div style="overflow-x:auto"><table class="tb"><tr><th>ID<th>Group<th>Units<th>Hospital<th>Urgency<th>Status</tr>'+DB.blood_requests.map(function(x){return "<tr><td>"+x.id+"<td>"+x.g+"<td>"+x.u+"<td>"+esc(x.h)+", "+esc(x.c)+"<td>"+x.urg+'<td><select data-act="st" data-id="'+x.id+'">'+ST.map(function(s){return "<option"+(s==x.st?" selected":"")+">"+s+"</option>"}).join("")+"</select></tr>"}).join("")+'</table></div>'
+  +'<h2>Contact Messages</h2>'+(DB.messages.length?DB.messages.map(function(m){return '<div class="card" style="margin-bottom:8px"><b>'+esc(m.subject||"(no subject)")+'</b> from '+esc(m.name)+' ('+esc(m.email)+')<br>'+esc(m.body)+'</div>'}).join(""):'<p class="muted">No messages.</p>')
+  +'<h2>Demo Database Tables</h2>'+["users","donors","blood_requests","hospitals","blood_banks","notifications","messages"].map(function(t){var rows=DB[t];return "<details class='card' style='margin-top:8px'><summary><b>"+t+"</b> ("+rows.length+" rows)</summary><pre style='overflow:auto;font-size:12px'>"+esc(JSON.stringify(t=="users"?rows.map(function(u){return Object.assign({},u,{pw:"••••••••"})}):rows,null,1))+"</pre></details>"}).join("")
+  +'<p><button class="btn alt sm" data-act="reset">Reset demo database</button></p>'}
+ else h+='<div class="card"><p>Facility accounts will be able to maintain verified hospital and blood bank information in a later version.</p></div>';
+ el.innerHTML=h}
+$("dashbody").addEventListener("click",function(e){var b=e.target.closest("button[data-act]");if(!b)return;var a=b.dataset.act,i=b.dataset.id;
+ if(a=="out")S=null;
+ if(a=="ver")D.forEach(function(x){if(x.id==i)x.v=true});
+ if(a=="del")D.splice(D.findIndex(function(x){return x.id==i}),1);
+ if(a=="reset"){DB=JSON.parse(SEED);setRefs();S=null}
+ save();dash()});
+$("dashbody").addEventListener("change",function(e){var a=e.target.dataset.act,v=e.target.value;
+ if(a=="avail"){var d=me();if(d)d.a=v}
+ if(a=="st")DB.blood_requests.forEach(function(x){if(x.id==e.target.dataset.id)x.st=v});
+ save();dash()});
+
+/* ---- Nearby discovery ---- */
+opts("ng");
+var XY={Kalaburagi:[65,18],Bengaluru:[55,80],Mysuru:[40,90],Hubballi:[22,42]};
+function near(){var g=$("ng").value,c=$("nc").value.trim().toLowerCase(),cnt={};
+ var r=D.filter(function(d){return d.v!==false&&(!g||d.g==g)&&(!c||d.c.toLowerCase().indexOf(c)>-1)});
+ r.forEach(function(d){cnt[d.c]=(cnt[d.c]||0)+1});
+ $("map").innerHTML=Object.keys(cnt).map(function(k,i){var p=XY[k]||[20+(i*17)%60,50];return '<span class="pin" style="left:'+p[0]+'%;top:'+p[1]+'%">📍 '+esc(k)+' · '+cnt[k]+'</span>'}).join("");
+ $("nres").innerHTML=r.length?r.map(function(d){return dcard(d,1)}).join(""):'<div class="card"><h3>No Matching Donors Found</h3><p class="muted">Try another city or blood group.</p></div>'}
+$("nf").onsubmit=function(e){e.preventDefault();near()};
+$("nr").onclick=function(){setTimeout(near,0)};
+$("geo").onclick=function(){$("nmsg").textContent="Location access is simulated in this demo: showing donors near Kalaburagi. A real deployment would ask for browser permission.";$("nc").value="Kalaburagi";near()};
+
+function hook(){var h=location.hash.slice(1);stats();
+ $("featured").innerHTML=D.filter(function(x){return x.v}).slice(0,4).map(function(d){return dcard(d)}).join("");
+ if(h=="dash")dash();if(h=="nearby")near()}
+window.addEventListener("hashchange",hook);hook();
+</script>
+</body>
+</html>
